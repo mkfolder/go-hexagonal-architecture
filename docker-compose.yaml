@@ -1,0 +1,71 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgres://moxie_owner:passwd@postgres:5432/moxie?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --no-verbose
+        - --tries=1
+        - --spider
+        - http://127.0.0.1:5000/api/health
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - moxie-net
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=moxie_owner
+      - POSTGRES_PASSWORD=passwd
+      - POSTGRES_DB=moxie
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moxie_owner -d moxie"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - moxie-net
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "root@root.io"
+      PGADMIN_DEFAULT_PASSWORD: "toor"
+    ports:
+      - "1444:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - moxie-net
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/postgres_data
+  pgadmin_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/pgadmin_data
+
+networks:
+  moxie-net:

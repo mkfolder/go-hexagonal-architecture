@@ -1,0 +1,3 @@
+internal/bootstrap/wire_gen.go
+volumes/
+.env
