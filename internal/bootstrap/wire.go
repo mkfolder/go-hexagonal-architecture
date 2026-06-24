@@ -5,6 +5,8 @@ package bootstrap
 import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/wire"
+	"gorm.io/gorm"
+
 	"mkfolder.dev/wire-playground/internal/database"
 	pointDriven "mkfolder.dev/wire-playground/internal/point/adapters/driven"
 	pointDriving "mkfolder.dev/wire-playground/internal/point/adapters/driving"
@@ -18,7 +20,7 @@ import (
 )
 
 type Container struct {
-	DB *database.Postgres
+	DB *gorm.DB
 
 	UserService *user.UserService
 	UserAdapter *userDriving.HTTPAdapter
@@ -31,7 +33,7 @@ type Container struct {
 }
 
 func NewContainer(
-	db *database.Postgres,
+	db *gorm.DB,
 	userService *user.UserService,
 	userAdapter *userDriving.HTTPAdapter,
 	profileService *profile.ProfileService,
@@ -52,20 +54,25 @@ func NewContainer(
 
 func InitializeContainer(router fiber.Router) Container {
 	wire.Build(
-		database.NewPostgres,
+		database.NewGormDB,
+
 		user.NewUserService,
 		userDriven.NewPostgresRepository,
 		userDriving.NewHTTPAdapter,
+
 		point.NewPointService,
 		pointDriven.NewUserService,
 		pointDriving.NewHTTPAdapter,
+
 		profile.NewProfileService,
 		profileDriven.NewUserService,
 		profileDriving.NewHTTPAdapter,
+
 		NewContainer,
 
 		wire.Bind(new(user.UserRepository), new(*userDriven.PostgresRepository)),
 		wire.Bind(new(point.UserFetcher), new(*pointDriven.UserService)),
+
 		wire.Bind(new(profile.UserFetcher), new(*profileDriven.UserService)),
 		wire.Bind(new(profile.PointsFetcher), new(*point.PointService)),
 	)

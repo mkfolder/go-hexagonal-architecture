@@ -9,11 +9,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type Postgres struct {
-	db *gorm.DB
-}
-
-func NewPostgres() *Postgres {
+func NewGormDB() *gorm.DB {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		panic("DATABASE_URL not set")
@@ -27,9 +23,5 @@ func NewPostgres() *Postgres {
 		panic(err)
 	}
 
-	return &Postgres{db: gormDB}
-}
-
-func (p *Postgres) GetDB() *gorm.DB {
-	return p.db
+	return gormDB
 }

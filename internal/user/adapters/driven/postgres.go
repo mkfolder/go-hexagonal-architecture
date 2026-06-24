@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"mkfolder.dev/wire-playground/internal/database"
 	"mkfolder.dev/wire-playground/internal/user/core"
 )
 
@@ -31,19 +30,13 @@ type PostgresRepository struct {
 	db *gorm.DB
 }
 
-func NewPostgresRepository(pg *database.Postgres) *PostgresRepository {
-	return &PostgresRepository{db: pg.GetDB()}
+func NewPostgresRepository(db *gorm.DB) *PostgresRepository {
+	return &PostgresRepository{db: db}
 }
 
 func (r *PostgresRepository) FindByID(id uuid.UUID) (*core.User, error) {
 	var user UserModel
 	err := r.db.First(&user, id).Error
-	return user.toDomain(), err
-}
-
-func (r *PostgresRepository) FindByUsername(username string) (*core.User, error) {
-	var user UserModel
-	err := r.db.First(&user, "username = ?", username).Error
 	return user.toDomain(), err
 }
 
