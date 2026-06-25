@@ -2,17 +2,27 @@ package driven
 
 import (
 	"github.com/google/uuid"
-	"mkfolder.dev/wire-playground/internal/user/core"
+	"mkfolder.dev/wire-playground/internal/profile/core"
+	"mkfolder.dev/wire-playground/internal/shared"
 )
 
 type UserService struct {
-	svc *core.UserService
+	svc shared.UserAdapter
 }
 
-func NewUserService(svc *core.UserService) *UserService {
+func NewUserService(svc shared.UserAdapter) *UserService {
 	return &UserService{svc: svc}
 }
 
 func (s *UserService) FindByID(id uuid.UUID) (*core.User, error) {
-	return s.svc.FindByID(id)
+	u, err := s.svc.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return &core.User{
+		ID:        u.ID,
+		Email:     u.Email,
+		Username:  u.Username,
+		CreatedAt: u.CreatedAt,
+	}, nil
 }

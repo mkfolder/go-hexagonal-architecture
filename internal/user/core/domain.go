@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"mkfolder.dev/wire-playground/internal/shared"
 )
 
 type User struct {
@@ -14,7 +15,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (u *User) Validate() error {
+func (u User) Validate() error {
 	if u.Email == "" {
 		return errors.New("email is required")
 	}
@@ -22,4 +23,13 @@ func (u *User) Validate() error {
 		return errors.New("username is required")
 	}
 	return nil
+}
+
+func (u User) DTO() shared.UserDTO {
+	return shared.UserDTO{
+		ID:        u.ID,
+		Email:     u.Email,
+		Username:  u.Username,
+		CreatedAt: u.CreatedAt,
+	}
 }

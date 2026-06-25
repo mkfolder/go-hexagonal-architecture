@@ -1,12 +1,20 @@
 package core
 
 import (
+	"time"
+
 	"github.com/google/uuid"
-	"mkfolder.dev/wire-playground/internal/user/core"
 )
 
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	Email     string    `json:"email"`
+	Username  string    `json:"username"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type UserFetcher interface {
-	FindByID(id uuid.UUID) (*core.User, error)
+	FindByID(id uuid.UUID) (*User, error)
 }
 
 type PointsFetcher interface {

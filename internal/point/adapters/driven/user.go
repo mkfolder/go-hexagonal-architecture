@@ -3,14 +3,14 @@ package driven
 import (
 	"github.com/google/uuid"
 	"mkfolder.dev/wire-playground/internal/point/core"
-	user "mkfolder.dev/wire-playground/internal/user/core"
+	"mkfolder.dev/wire-playground/internal/shared"
 )
 
 type UserService struct {
-	svc *user.UserService
+	svc shared.UserAdapter
 }
 
-func NewUserService(svc *user.UserService) *UserService {
+func NewUserService(svc shared.UserAdapter) *UserService {
 	return &UserService{svc: svc}
 }
 

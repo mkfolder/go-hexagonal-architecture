@@ -14,6 +14,7 @@ import (
 	profileDriving "mkfolder.dev/wire-playground/internal/profile/adapters/driving"
 	profileBootstrap "mkfolder.dev/wire-playground/internal/profile/bootstrap"
 	profile "mkfolder.dev/wire-playground/internal/profile/core"
+	"mkfolder.dev/wire-playground/internal/shared"
 	userDriving "mkfolder.dev/wire-playground/internal/user/adapters/driving"
 	userBootstrap "mkfolder.dev/wire-playground/internal/user/bootstrap"
 	user "mkfolder.dev/wire-playground/internal/user/core"
@@ -22,33 +23,36 @@ import (
 type Container struct {
 	DB *gorm.DB
 
-	UserService *user.UserService
-	UserAdapter *userDriving.HTTPAdapter
+	UserService        *user.UserService
+	UserHTTPAdapter    *userDriving.HTTPAdapter
+	UserHexagonAdapter *userDriving.HexagonAdapter
 
-	ProfileService *profile.ProfileService
-	ProfileAdapter *profileDriving.HTTPAdapter
+	ProfileService     *profile.ProfileService
+	ProfileHTTPAdapter *profileDriving.HTTPAdapter
 
-	PointService *point.PointService
-	PointAdapter *pointDriving.HTTPAdapter
+	PointService     *point.PointService
+	PointHTTPAdapter *pointDriving.HTTPAdapter
 }
 
 func NewContainer(
 	db *gorm.DB,
 	userService *user.UserService,
-	userAdapter *userDriving.HTTPAdapter,
+	userHTTPAdapter *userDriving.HTTPAdapter,
+	userHexagonAdapter *userDriving.HexagonAdapter,
 	profileService *profile.ProfileService,
-	profileAdapter *profileDriving.HTTPAdapter,
+	profileHTTPAdapter *profileDriving.HTTPAdapter,
 	pointService *point.PointService,
-	pointAdapter *pointDriving.HTTPAdapter,
+	pointHTTPAdapter *pointDriving.HTTPAdapter,
 ) Container {
 	return Container{
-		DB:             db,
-		UserService:    userService,
-		UserAdapter:    userAdapter,
-		ProfileService: profileService,
-		ProfileAdapter: profileAdapter,
-		PointService:   pointService,
-		PointAdapter:   pointAdapter,
+		DB:                 db,
+		UserService:        userService,
+		UserHTTPAdapter:    userHTTPAdapter,
+		UserHexagonAdapter: userHexagonAdapter,
+		ProfileService:     profileService,
+		ProfileHTTPAdapter: profileHTTPAdapter,
+		PointService:       pointService,
+		PointHTTPAdapter:   pointHTTPAdapter,
 	}
 }
 
@@ -59,6 +63,9 @@ func InitializeContainer(router fiber.Router) Container {
 		pointBootstrap.PointSet,
 		profileBootstrap.ProfileSet,
 		NewContainer,
+
+		userDriving.NewHexagonAdapter,
+		wire.Bind(new(shared.UserAdapter), new(*userDriving.HexagonAdapter)),
 	)
 	return Container{}
 }
