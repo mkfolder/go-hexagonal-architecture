@@ -8,14 +8,14 @@ import (
 	"gorm.io/gorm"
 
 	"mkfolder.dev/wire-playground/internal/database"
-	pointDriven "mkfolder.dev/wire-playground/internal/point/adapters/driven"
 	pointDriving "mkfolder.dev/wire-playground/internal/point/adapters/driving"
+	pointBootstrap "mkfolder.dev/wire-playground/internal/point/bootstrap"
 	point "mkfolder.dev/wire-playground/internal/point/core"
-	profileDriven "mkfolder.dev/wire-playground/internal/profile/adapters/driven"
 	profileDriving "mkfolder.dev/wire-playground/internal/profile/adapters/driving"
+	profileBootstrap "mkfolder.dev/wire-playground/internal/profile/bootstrap"
 	profile "mkfolder.dev/wire-playground/internal/profile/core"
-	userDriven "mkfolder.dev/wire-playground/internal/user/adapters/driven"
 	userDriving "mkfolder.dev/wire-playground/internal/user/adapters/driving"
+	userBootstrap "mkfolder.dev/wire-playground/internal/user/bootstrap"
 	user "mkfolder.dev/wire-playground/internal/user/core"
 )
 
@@ -55,26 +55,10 @@ func NewContainer(
 func InitializeContainer(router fiber.Router) Container {
 	wire.Build(
 		database.NewGormDB,
-
-		user.NewUserService,
-		userDriven.NewPostgresRepository,
-		userDriving.NewHTTPAdapter,
-
-		point.NewPointService,
-		pointDriven.NewUserService,
-		pointDriving.NewHTTPAdapter,
-
-		profile.NewProfileService,
-		profileDriven.NewUserService,
-		profileDriving.NewHTTPAdapter,
-
+		userBootstrap.UserSet,
+		pointBootstrap.PointSet,
+		profileBootstrap.ProfileSet,
 		NewContainer,
-
-		wire.Bind(new(user.UserRepository), new(*userDriven.PostgresRepository)),
-		wire.Bind(new(point.UserFetcher), new(*pointDriven.UserService)),
-
-		wire.Bind(new(profile.UserFetcher), new(*profileDriven.UserService)),
-		wire.Bind(new(profile.PointsFetcher), new(*point.PointService)),
 	)
 	return Container{}
 }

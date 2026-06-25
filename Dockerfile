@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN go install github.com/google/wire/cmd/wire@latest
+RUN wire gen ./internal/bootstrap
 RUN go mod download
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o playground ./cmd/server/main.go

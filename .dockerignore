@@ -6,5 +6,6 @@
 
 Makefile
 README.md
+wire_gen.go
 
 volumes/

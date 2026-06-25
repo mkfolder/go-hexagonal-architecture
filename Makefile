@@ -1,7 +1,9 @@
 gen:
 	@wire gen ./internal/bootstrap
 
-compose: gen
+compose:
+	@mkdir -p volumes/postgres_data
+	@mkdir -p volumes/pgadmin_data
 	@docker compose up -d
 
 down:
